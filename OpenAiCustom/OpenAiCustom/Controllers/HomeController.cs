@@ -100,7 +100,7 @@ public class HomeController : Controller
         else
             questionText = $"Question: {question} , Instructions : {instructions}";
 
-        var answer = await OpenAiManager.GetChat(apiKey, "o3-mini", questionText);
+        var answer = await OpenAiManager.GetChat(apiKey, model.modelId, questionText);
 
         var timeComplete = DateTime.Now;
 

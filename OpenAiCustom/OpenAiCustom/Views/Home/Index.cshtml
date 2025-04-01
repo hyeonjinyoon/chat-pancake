@@ -156,7 +156,8 @@
                 body: JSON.stringify({
                     data: typped,
                     instructions: instructionText,
-                    apiKey: apiKeyText
+                    apiKey: apiKeyText,
+                    modelId: modelName,
                 })
             })
                 .then(response => {
