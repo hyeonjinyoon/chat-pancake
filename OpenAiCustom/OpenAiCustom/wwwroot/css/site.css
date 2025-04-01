@@ -1,167 +1,187 @@
-
 @font-face {
-  font-family: 'Pretendard';
-  font-weight: 900;
-  font-display: swap;
-  src: local('Pretendard Black'), url(/fonts/woff2/Pretendard-Black.woff2) format('woff2'), url(/fonts/woff/Pretendard-Black.woff) format('woff');
+    font-family: 'Pretendard';
+    font-weight: 900;
+    font-display: swap;
+    src: local('Pretendard Black'), url(/fonts/woff2/Pretendard-Black.woff2) format('woff2'), url(/fonts/woff/Pretendard-Black.woff) format('woff');
 }
 
 @font-face {
-  font-family: 'Pretendard';
-  font-weight: 800;
-  font-display: swap;
-  src: local('Pretendard ExtraBold'), url(/fonts/woff2/Pretendard-ExtraBold.woff2) format('woff2'), url(/fonts/woff/Pretendard-ExtraBold.woff) format('woff');
+    font-family: 'Pretendard';
+    font-weight: 800;
+    font-display: swap;
+    src: local('Pretendard ExtraBold'), url(/fonts/woff2/Pretendard-ExtraBold.woff2) format('woff2'), url(/fonts/woff/Pretendard-ExtraBold.woff) format('woff');
 }
 
 @font-face {
-  font-family: 'Pretendard';
-  font-weight: 700;
-  font-display: swap;
-  src: local('Pretendard Bold'), url(/fonts/woff2/Pretendard-Bold.woff2) format('woff2'), url(/fonts/woff/Pretendard-Bold.woff) format('woff');
+    font-family: 'Pretendard';
+    font-weight: 700;
+    font-display: swap;
+    src: local('Pretendard Bold'), url(/fonts/woff2/Pretendard-Bold.woff2) format('woff2'), url(/fonts/woff/Pretendard-Bold.woff) format('woff');
 }
 
 @font-face {
-  font-family: 'Pretendard';
-  font-weight: 600;
-  font-display: swap;
-  src: local('Pretendard SemiBold'), url(/fonts/woff2/Pretendard-SemiBold.woff2) format('woff2'), url(/fonts/woff/Pretendard-SemiBold.woff) format('woff');
+    font-family: 'Pretendard';
+    font-weight: 600;
+    font-display: swap;
+    src: local('Pretendard SemiBold'), url(/fonts/woff2/Pretendard-SemiBold.woff2) format('woff2'), url(/fonts/woff/Pretendard-SemiBold.woff) format('woff');
 }
 
 @font-face {
-  font-family: 'Pretendard';
-  font-weight: 500;
-  font-display: swap;
-  src: local('Pretendard Medium'), url(/fonts/woff2/Pretendard-Medium.woff2) format('woff2'), url(/fonts/woff/Pretendard-Medium.woff) format('woff');
+    font-family: 'Pretendard';
+    font-weight: 500;
+    font-display: swap;
+    src: local('Pretendard Medium'), url(/fonts/woff2/Pretendard-Medium.woff2) format('woff2'), url(/fonts/woff/Pretendard-Medium.woff) format('woff');
 }
 
 @font-face {
-  font-family: 'Pretendard';
-  font-weight: 400;
-  font-display: swap;
-  src: local('Pretendard Regular'), url(/fonts/woff2/Pretendard-Regular.woff2) format('woff2'), url(/fonts/woff/Pretendard-Regular.woff) format('woff');
+    font-family: 'Pretendard';
+    font-weight: 400;
+    font-display: swap;
+    src: local('Pretendard Regular'), url(/fonts/woff2/Pretendard-Regular.woff2) format('woff2'), url(/fonts/woff/Pretendard-Regular.woff) format('woff');
 }
 
 @font-face {
-  font-family: 'Pretendard';
-  font-weight: 300;
-  font-display: swap;
-  src: local('Pretendard Light'), url(/fonts/woff2/Pretendard-Light.woff2) format('woff2'), url(/fonts/woff/Pretendard-Light.woff) format('woff');
+    font-family: 'Pretendard';
+    font-weight: 300;
+    font-display: swap;
+    src: local('Pretendard Light'), url(/fonts/woff2/Pretendard-Light.woff2) format('woff2'), url(/fonts/woff/Pretendard-Light.woff) format('woff');
 }
 
 @font-face {
-  font-family: 'Pretendard';
-  font-weight: 200;
-  font-display: swap;
-  src: local('Pretendard ExtraLight'), url(/fonts/woff2/Pretendard-ExtraLight.woff2) format('woff2'), url(/fonts/woff/Pretendard-ExtraLight.woff) format('woff');
+    font-family: 'Pretendard';
+    font-weight: 200;
+    font-display: swap;
+    src: local('Pretendard ExtraLight'), url(/fonts/woff2/Pretendard-ExtraLight.woff2) format('woff2'), url(/fonts/woff/Pretendard-ExtraLight.woff) format('woff');
 }
 
 @font-face {
-  font-family: 'Pretendard';
-  font-weight: 100;
-  font-display: swap;
-  src: local('Pretendard Thin'), url(/fonts/woff2/Pretendard-Thin.woff2) format('woff2'), url(/fonts/woff/Pretendard-Thin.woff) format('woff');
+    font-family: 'Pretendard';
+    font-weight: 100;
+    font-display: swap;
+    src: local('Pretendard Thin'), url(/fonts/woff2/Pretendard-Thin.woff2) format('woff2'), url(/fonts/woff/Pretendard-Thin.woff) format('woff');
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 html {
-  font-size: 16px;
-  font-family: Pretendard, serif;
-  font-weight: 400;
+    font-size: 16px;
+    font-family: Pretendard, serif;
+    font-weight: 400;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+    color: var(--bs-secondary-color);
+    text-align: end;
 }
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+    text-align: start;
 }
 
 /* custom */
 
 .input-box {
-  width: 100%;
-  height: 100%;
-  border-top: none;
-  border-left: none;
-  border-right: none;
-  border-bottom: none;
-  resize: none;
-  padding: 12px;
-  background: transparent;
-  outline: none;
-  color: #ccc;
+    width: 100%;
+    height: 100%;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    resize: none;
+    padding: 12px;
+    background: transparent;
+    outline: none;
+    color: #ccc;
 }
 
 .input-box-holder {
-  width: 100%;
-  height: 110px;
-  border-radius: 20px;
-  color: #ccc;
-  align-items: center;
+    width: 100%;
+    height: 110px;
+    border-radius: 20px;
+    color: #ccc;
+    align-items: center;
+}
+
+.chat-button {
+    padding: 4px;
+    color: #919191;
+    background: transparent;
+    align-items: center;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
 }
 
 @keyframes tilt {
-  0%   { transform: rotate(0deg); }
-  25%  { transform: rotate(-15deg); }
-  50%  { transform: rotate(0deg); }
-  75%  { transform: rotate(15deg); }
-  100% { transform: rotate(0deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    25% {
+        transform: rotate(-15deg);
+    }
+    50% {
+        transform: rotate(0deg);
+    }
+    75% {
+        transform: rotate(15deg);
+    }
+    100% {
+        transform: rotate(0deg);
+    }
 }
 
 .load-icon {
-  display: inline-block;
-  animation: tilt 1s infinite;
+    display: inline-block;
+    animation: tilt 1s infinite;
 }
 
 /* 스크롤 바 */
 ::-webkit-scrollbar {
-  width: 8px;            /* 스크롤바 두께 */
-  height: 8px;           /* 가로 스크롤바 높이 */
+    width: 8px; /* 스크롤바 두께 */
+    height: 8px; /* 가로 스크롤바 높이 */
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent; /* 트랙 배경 - 투명(또는 배경색) */
+    background: transparent; /* 트랙 배경 - 투명(또는 배경색) */
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #5f616a;      /* 스크롤바 색상 */
-  border-radius: 4px;       /* 둥글게 처리 */
-  border: 2px solid #343541;/* 배경색과 통일감이 있도록 테두리 */
-  transition: background 0.2s;
+    background: #5f616a; /* 스크롤바 색상 */
+    border-radius: 4px; /* 둥글게 처리 */
+    border: 2px solid #343541; /* 배경색과 통일감이 있도록 테두리 */
+    transition: background 0.2s;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #8a8c92;      /* 마우스 오버 시 조금 더 밝은 색상 */
+    background: #8a8c92; /* 마우스 오버 시 조금 더 밝은 색상 */
 }
 
 html {
-  /* 얇은(thin) 스크롤바와 색상 지정 */
-  scrollbar-width: thin;
-  scrollbar-color: #5f616a transparent;
+    /* 얇은(thin) 스크롤바와 색상 지정 */
+    scrollbar-width: thin;
+    scrollbar-color: #5f616a transparent;
 }

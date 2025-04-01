@@ -3,16 +3,14 @@ namespace OpenAiCustom.Managers;
 
 public class OpenAiManager
 {
-    private static OpenAIClient _client;
+    private static Dictionary<string, OpenAIClient> _clients = new();
 
-    public static void Initialize()
+    public static async Task<string> GetChat(string apiKey, string model, string text)
     {
-        _client = new OpenAIClient(Environment.GetEnvironmentVariable("OPENAI_API_KEY"));
-    }
+        if (!_clients.ContainsKey(apiKey))
+            _clients.Add(apiKey, new OpenAIClient(apiKey));
 
-    public static async Task<string> GetChat(string text)
-    {
-        var response = await _client.GetOpenAIResponseClient("o1").CreateResponseAsync(text);
+        var response = await _clients[apiKey].GetOpenAIResponseClient(model).CreateResponseAsync(text);
         return response.Value.GetOutputText();
     }
 }

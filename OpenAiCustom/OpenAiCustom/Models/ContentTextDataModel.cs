@@ -2,6 +2,7 @@
 
 public class ContentTextDataModel
 {
-    public string Data { get; set; }
-    public string Instruction { get; set; }
+    public string data { get; set; }
+    public string instructions { get; set; }
+    public string apiKey { get; set; }
 }

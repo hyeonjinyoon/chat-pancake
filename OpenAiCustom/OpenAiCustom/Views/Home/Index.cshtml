@@ -5,17 +5,33 @@
 <div style="width: 100%; max-width: 720px; padding: 5px; height: 100%; margin: 24px auto;">
     <div class="flex h-full w-full" style="width: 100%">
         <div style="color: #919191; width: fit-content; margin: 0 auto; align-items: center;">
-            🥞o1-pro
+            🥞
         </div>
         <div id="tblContent" style="height: 100%; width: 100%; margin-bottom: 300px;">
         </div>
 
         <div style="position: fixed; bottom: 0; left: 0; width: 100%; align-items: center;">
+            <div style="width: 100%; max-width: 720px; margin: 0 auto 4px;">
+                <button id="api-key" class="chat-button" type="button" onclick="openInput('apikey')"
+                        style="margin-top: 6px; color:dodgerblue;">
+                    api key 세팅이 필요합니다
+                </button>
+                <button id="model" class="chat-button" type="button" onclick="openInput('model')"
+                        style="margin-top: 6px;">
+                    o1
+                </button>
+                <button id="instructions" class="chat-button" type="button" onclick="openInput('instructions')"
+                        style="margin-top: 6px;">
+                    지침 없음
+                </button>
+            </div>
+
             <div class="input-box-holder"
-                 style="width: 100%; max-width: 720px; margin: 0 auto 46px; background: #2e2e2e;">
+                 style="width: 100%; max-width: 720px; margin: 0 auto 48px; background: #2e2e2e;">
+
                 <form onsubmit="SendInput(); return false;" style="width: 100%; height: 100%;">
-                    <textarea class="input-box" id="input1" placeholder="> ..."
-                              onkeydown="handleKeyDown(event)"></textarea>
+                        <textarea class="input-box" id="input1" placeholder="> ..."
+                                  onkeydown="handleKeyDown(event)"></textarea>
                     <input type="submit" style="display: none;">
                 </form>
             </div>
@@ -23,14 +39,75 @@
     </div>
 </div>
 
+<div id="modalInput"
+     style="display:none; position:fixed; top:20%; left:50%; transform:translate(-50%, -20%); z-index: 9999; background:#2e2e2e; color:#ccc; border:1px solid #444; border-radius:8px; padding:45px; width:600px;">
+    <div id="modalTitle" style="font-weight:bold; margin-bottom: 10px;"></div>
+    <textarea id="modalText"
+              class="input-box"
+              style="width:100%; height:100px; min-height: 400px; background:#3e3e3e; color:#ccc; border:0; border-radius:4px; padding:8px;"></textarea>
+    <div style="text-align: right; margin-top: 10px;">
+        <button type="button" onclick="saveModal()" style="margin-right: 5px;">저장</button>
+        <button type="button" onclick="closeModal()">닫기</button>
+    </div>
+</div>
+
 @section Scripts
 {
     <script type="text/javascript">
-        // Enter키: 송신, Shift+Enter: 줄바꿈 처리
+        let instructionText = "";
+        let apiKeyText = "";
+        let modelName = "o1";
+        let currentEdit = "";
+
         function handleKeyDown(e) {
             if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
                 SendInput();
+            }
+        }
+
+        function openInput(type) {
+            currentEdit = type;
+
+            if (type === "instructions") {
+                document.getElementById('modalTitle').textContent = "지시 사항 입력";
+                document.getElementById('modalText').value = instructionText;
+            } else if (type === "apikey") {
+                document.getElementById('modalTitle').textContent = "API 키 입력";
+                document.getElementById('modalText').value = apiKeyText;
+            } else if (type === "model") {
+                document.getElementById('modalTitle').textContent = "모델 id 입력";
+                document.getElementById('modalText').value = modelName;
+            }
+
+            document.getElementById('modalInput').style.display = 'block';
+        }
+
+        function saveModal() {
+            let val = document.getElementById('modalText').value;
+            if (currentEdit === "instructions") {
+                instructionText = val;
+            } else if (currentEdit === "apikey") {
+                apiKeyText = val;
+            } else if (currentEdit === "model") {
+                modelName = val;
+            }
+            closeModal();
+        }
+
+        function closeModal() {
+            document.getElementById('modalInput').style.display = 'none';
+
+            $('#model').text(modelName);
+
+            if (instructionText === "") {
+                $('#instructions').text('지침 없음');
+            } else {
+                $('#instructions').text('지침: ' + instructionText.substring(0, 6) + '...');
+            }
+
+            if (apiKeyText !== "") {
+                $('#api-key').text("");
             }
         }
 
@@ -46,10 +123,18 @@
 
             let chatId = crypto.randomUUID();
 
+            let instruct = "";
+
+            if (instructionText !== "")
+                instruct = instructionText.substring(0, 6) + "...";
+
             $('#tblContent').append("<div id='chat-" + chatId + "' style='width: 100%;'>"
                 + "<div id='question-" + chatId + "' style='margin-top: 8px; margin-left: auto; width: fit-content; max-width: 600px;" +
                 "background-color: #303030; color: #ccc; padding: 9px; border-radius: 20px;" +
                 "align-items: center; white-space: pre-wrap; overflow: auto;'>"
+                + "</div>"
+                + "<div style='margin-left: auto; width: fit-content; color: #919191'>"
+                + instruct
                 + "</div>"
                 + "<div style='width: 20px; height: 20px; margin-left: auto; color: #919191; cursor: pointer;' onclick=copyToClipboard('question-" + chatId + "')>"
                 + "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-copy' viewBox='0 0 16 16'>                <path fill-rule='evenodd' d='M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z'/></svg>"
@@ -68,7 +153,11 @@
                 headers: {
                     'Content-Type': 'application/json; charset=utf-8'
                 },
-                body: JSON.stringify({data: typped})
+                body: JSON.stringify({
+                    data: typped,
+                    instructions: instructionText,
+                    apiKey: apiKeyText
+                })
             })
                 .then(response => {
                     if (!response.ok) {
@@ -91,5 +180,6 @@
             const textToCopy = document.getElementById(id).textContent;
             navigator.clipboard.writeText(textToCopy);
         }
+
     </script>
 }
