@@ -40,14 +40,14 @@
 </div>
 
 <div id="modalInput"
-     style="display:none; position:fixed; top:20%; left:50%; transform:translate(-50%, -20%); z-index: 9999; background:#2e2e2e; color:#ccc; border:1px solid #444; border-radius:8px; padding:45px; width:600px;">
+     style="display:none; position:fixed; top:20%; left:50%; transform:translate(-50%, -20%); z-index: 9999; background:#2e2e2e; color:#ccc; border:1px solid #444; border-radius:20px; padding:15px; width: 100%; max-width:600px;">
     <div id="modalTitle" style="font-weight:bold; margin-bottom: 10px;"></div>
     <textarea id="modalText"
               class="input-box"
               style="width:100%; height:100px; min-height: 400px; background:#3e3e3e; color:#ccc; border:0; border-radius:4px; padding:8px;"></textarea>
     <div style="text-align: right; margin-top: 10px;">
-        <button type="button" onclick="saveModal()" style="margin-right: 5px;">저장</button>
-        <button type="button" onclick="closeModal()">닫기</button>
+        <button class="chat-button" type="button" onclick="saveModal()">저장</button>
+        <button class="chat-button" type="button" onclick="closeModal()">닫기</button>
     </div>
 </div>
 
@@ -66,7 +66,7 @@
                 $('#api-key').text("");
             }
         });
-        
+
         function handleKeyDown(e) {
             if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -172,7 +172,7 @@
                 .then(response => {
                     if (!response.ok) {
                         $("load-" + chatId).append("response error");
-                        throw new Error('네트워크 응답에 문제가 있습니다.');
+                        throw new Error("response error");
                     }
                     return response.json();
                 })
@@ -182,7 +182,8 @@
                     $('#' + data.answerId).text(data.content);
                 })
                 .catch(error => {
-                    $("load-" + chatId).append("error<br>" + error.string());
+                    document.getElementById("load-" + chatId).remove();
+                    $('#chat-' + chatId).append("<div style='color:#ccc;'>error</div>");
                 });
         }
 
