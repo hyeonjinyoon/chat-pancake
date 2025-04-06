@@ -59,6 +59,14 @@
         let modelName = "o1";
         let currentEdit = "";
 
+        document.addEventListener("DOMContentLoaded", function () {
+            const savedApiKey = getCookie("apiKey");
+            if (savedApiKey) {
+                apiKeyText = savedApiKey;
+                $('#api-key').text("");
+            }
+        });
+        
         function handleKeyDown(e) {
             if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -89,6 +97,7 @@
                 instructionText = val;
             } else if (currentEdit === "apikey") {
                 apiKeyText = val;
+                setCookie("apiKey", apiKeyText, 365);
             } else if (currentEdit === "model") {
                 modelName = val;
             }
@@ -180,6 +189,28 @@
         function copyToClipboard(id) {
             const textToCopy = document.getElementById(id).textContent;
             navigator.clipboard.writeText(textToCopy);
+        }
+
+        function setCookie(name, value, days) {
+            let expires = "";
+            if (days) {
+                let date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (encodeURIComponent(value) || "") + expires + "; path=/";
+        }
+
+        function getCookie(name) {
+            let nameEQ = name + "=";
+            let ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i].trim();
+                if (c.indexOf(nameEQ) === 0) {
+                    return decodeURIComponent(c.substring(nameEQ.length, c.length));
+                }
+            }
+            return null;
         }
 
     </script>
