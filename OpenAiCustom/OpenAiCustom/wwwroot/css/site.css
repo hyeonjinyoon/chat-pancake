@@ -161,8 +161,8 @@ body {
 
 /* 스크롤 바 */
 ::-webkit-scrollbar {
-    width: 8px; /* 스크롤바 두께 */
-    height: 8px; /* 가로 스크롤바 높이 */
+    width: 4px; /* 스크롤바 두께 */
+    height: 6px; /* 가로 스크롤바 높이 */
 }
 
 ::-webkit-scrollbar-track {
@@ -184,4 +184,11 @@ html {
     /* 얇은(thin) 스크롤바와 색상 지정 */
     scrollbar-width: thin;
     scrollbar-color: #5f616a transparent;
+}
+
+@media (max-width: 900px) {
+    /*.hide-on-small */
+    .hide-on-small {
+        display: none;
+    }
 }

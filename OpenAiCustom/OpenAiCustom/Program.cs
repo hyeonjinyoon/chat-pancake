@@ -1,8 +1,18 @@
+using Amazon;
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DataModel;
+using Amazon.Runtime;
 using OpenAiCustom.Managers;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+AwsManager.Initialize();
+
+var credentials = new BasicAWSCredentials(AwsManager.accessKey, AwsManager.secretKey);
+AwsManager.Client = new AmazonDynamoDBClient(credentials, RegionEndpoint.USEast1);
+AwsManager.DbContext = new DynamoDBContext(AwsManager.Client);
 
 var app = builder.Build();
 
