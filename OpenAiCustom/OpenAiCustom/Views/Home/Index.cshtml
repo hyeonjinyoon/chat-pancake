@@ -4,36 +4,33 @@
 
 <div style="width: 100%; max-width: 720px; padding: 5px; height: 100%; margin: 24px auto;">
     <div class="flex h-full w-full" style="width: 100%">
-        <div style="color: #919191; width: fit-content; margin: 0 auto; align-items: center;">
-            🥞
-        </div>
         <div id="tblContent" style="height: 100%; width: 100%; margin-bottom: 300px;">
         </div>
 
         <div style="position: fixed; bottom: 0; left: 0; width: 100%; align-items: center;">
-            <div style="width: 100%; max-width: 720px; margin: 0 auto 4px;">
-                <button id="api-key" class="chat-button" type="button" onclick="openInput('apikey')"
-                        style="margin-top: 6px; color:dodgerblue;">
-                    api key 세팅이 필요합니다
-                </button>
-                <button id="model" class="chat-button" type="button" onclick="openInput('model')"
-                        style="margin-top: 6px;">
-                    o1
-                </button>
-                <button id="instructions" class="chat-button" type="button" onclick="openInput('instructions')"
-                        style="margin-top: 6px;">
-                    지침 없음
-                </button>
-            </div>
-
             <div class="input-box-holder"
-                 style="width: 100%; max-width: 720px; margin: 0 auto 48px; background: #2e2e2e;">
+                 style="width: 100%; max-width: 720px; margin: 0 auto 48px; background: #262626;">
 
                 <form onsubmit="SendInput(); return false;" style="width: 100%; height: 100%;">
                     <textarea class="input-box" id="input1" placeholder="> ..."
                               onkeydown="handleKeyDown(event)"></textarea>
                     <input type="submit" style="display: none;">
                 </form>
+
+                <div style="width: 100%; max-width: 720px; margin: 0 auto 4px;">
+                    <button id="api-key" class="chat-button" type="button" onclick="openInput('apikey')"
+                            style="margin-top: 2px;">
+                        <p style="color:dodgerblue;">api key 세팅이 필요합니다</p>
+                    </button>
+                    <button id="model" class="chat-button" type="button" onclick="openInput('model')"
+                            style="margin-top: 2px;">
+                        model
+                    </button>
+                    <button id="instructions" class="chat-button" type="button" onclick="openInput('instructions')"
+                            style="margin-top: 2px;">
+                        지침 없음
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -93,15 +90,14 @@
     <script type="text/javascript">
         let instructionText = "";
         let apiKeyText = "";
-        let modelName = "o1";
+        let modelName = "-";
         let currentEdit = "";
 
         document.addEventListener("DOMContentLoaded", function () {
             const savedApiKey = getCookie("apiKey");
             if (savedApiKey) {
                 apiKeyText = savedApiKey;
-                $('#api-key').text("");
-                GetChatList(savedApiKey);
+                OnApiKeySettingDone();
             }
         });
 
@@ -110,6 +106,32 @@
                 e.preventDefault();
                 SendInput();
             }
+        }
+
+        function GetDefaultModel(id) {
+            fetch('@Url.Action("GetDefaultModel")', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8'
+                },
+                body: JSON.stringify({
+                    data: id
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("response error");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    modelName = data.model;
+                    $('#model').text(modelName);
+                })
+                .catch(error => {
+                    $('#chat-list').html("error");
+                });
         }
 
         function GetChatList(id) {
@@ -149,12 +171,12 @@
 
         function LoadChat(sortId, chatId) {
             const target = document.getElementById('chat-' + chatId);
-            
+
             if (target) {
-                target.scrollIntoView({ behavior: 'smooth' });
+                target.scrollIntoView({behavior: 'smooth'});
                 return;
             }
-            
+
             let instruct = "";
 
             if (instructionText !== "")
@@ -162,7 +184,7 @@
 
             $('#tblContent').append("<div id='chat-" + chatId + "' style='width: 100%;'>"
                 + "<div id='question-" + chatId + "' style='margin-top: 8px; margin-left: auto; width: fit-content; max-width: 600px;" +
-                "background-color: #303030; color: #ccc; padding: 9px; border-radius: 20px;" +
+                "background-color: #262626; color: #ccc; padding: 9px; border-radius: 20px;" +
                 "align-items: center; white-space: pre-wrap; overflow: auto;'>"
                 + "</div>"
                 + "<div style='margin-left: auto; width: fit-content; color: #919191'>"
@@ -247,9 +269,15 @@
                 $('#instructions').text('지침: ' + instructionText.substring(0, 6) + '...');
             }
 
-            if (apiKeyText !== "") {
-                $('#api-key').text("");
+            if (currentEdit === "apikey" && apiKeyText !== "") {
+                OnApiKeySettingDone();
             }
+        }
+
+        function OnApiKeySettingDone() {
+            $('#api-key').text("-");
+            GetChatList(apiKeyText);
+            GetDefaultModel(apiKeyText);
         }
 
         function SendInput() {
@@ -271,7 +299,7 @@
 
             $('#tblContent').append("<div id='chat-" + chatId + "' style='width: 100%;'>"
                 + "<div id='question-" + chatId + "' style='margin-top: 8px; margin-left: auto; width: fit-content; max-width: 600px;" +
-                "background-color: #303030; color: #ccc; padding: 9px; border-radius: 20px;" +
+                "background-color: #262626; color: #ccc; padding: 9px; border-radius: 20px;" +
                 "align-items: center; white-space: pre-wrap; overflow: auto;'>"
                 + "</div>"
                 + "<div style='margin-left: auto; width: fit-content; color: #919191'>"
@@ -313,8 +341,9 @@
                     $('#chat-' + chatId).append(data.html);
                     $('#' + data.answerId).text(data.content);
                     $('#chat-list').prepend(data.listHtml);
+                    $('#title').text(data.questionCondensed + " - Pancake");
 
-                    document.getElementById('chat-' + chatId).scrollIntoView({ behavior: 'smooth' });
+                    document.getElementById('chat-' + chatId).scrollIntoView({behavior: 'smooth'});
                 })
                 .catch(error => {
                     document.getElementById("load-" + chatId).remove();

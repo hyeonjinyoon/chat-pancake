@@ -37,6 +37,19 @@ public class HomeController : Controller
             RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
         });
     }
+    
+    [HttpPost]
+    public async Task<JsonResult> GetDefaultModel([FromBody] ModelDefault model)
+    {
+        var defaultModel = Environment.GetEnvironmentVariable("DEFAULT_CHAT_MODEL") ?? string.Empty;
+
+        var data = new
+        {
+            model = defaultModel
+        };
+
+        return Json(data);
+    }
 
     [HttpPost]
     public async Task<JsonResult> GetChatList([FromBody] ModelDefault model)
@@ -87,14 +100,14 @@ public class HomeController : Controller
         //todo: 아래 ReceiveText랑 공통 부분 묶기
         var answerHtml = $"""
                           <div style="color: #707070;">
-                          {chat.creationElapsedTime:N0}초 동안 조리
+                          {chat.creationElapsedTime:N0}초 동안 생각
                           </div>
                           <div
                               id="{chatAnswerId}"
                               style="margin-top: 8px;
                               margin-right: auto; 
                               width: fit-content; 
-                              background-color: #303030; 
+                              background-color: #262626; 
                               color: #ccc; padding: 9px; 
                               border-radius: 20px; 
                               max-width: 600px;
@@ -125,14 +138,14 @@ public class HomeController : Controller
 
         var answerHtml = $"""
                           <div style="color: #707070;">
-                          %%%Second초 동안 조리
+                          %%%Second초 동안 생각
                           </div>
                           <div
                               id="answer-{answerId}"
                               style="margin-top: 8px;
                               margin-right: auto; 
                               width: fit-content; 
-                              background-color: #303030; 
+                              background-color: #262626; 
                               color: #ccc; padding: 9px; 
                               border-radius: 20px; 
                               max-width: 600px;
@@ -167,8 +180,21 @@ public class HomeController : Controller
         if (noSave)
             question = question.Replace("!nosave", "");
 
+        var sortKey = $"{DateTime.UtcNow.Ticks}-{answerId}";
+        var questionCondensed = question.Length < 9 ? question : question[..9] + "..";
+        var chatId = model.chatId;
+        
+        var listHtml = $"""
+                            <div
+                                class="click-color unselectable"
+                               onclick="LoadChat('{sortKey}', '{chatId}')"
+                               style="width:95%; cursor: pointer; background-color: transparent;  border-radius: 10px; padding: 4px 8px;">
+                               {questionCondensed}
+                            </div>
+                        """;
+        
         var timeBegin = DateTime.Now;
-
+        
         if (string.IsNullOrEmpty(apiKey))
         {
             answerHtml = answerHtml.Replace("%%%Second", "0");
@@ -177,6 +203,8 @@ public class HomeController : Controller
                 html = answerHtml,
                 content = "API 키 세팅이 필요합니다",
                 answerId = $"answer-{answerId}",
+                questionCondensed = questionCondensed,
+                listHtml = listHtml
             });
         }
 
@@ -197,19 +225,6 @@ public class HomeController : Controller
 
         if (noSave)
             answer = "(This conversation is not saved.)\n" + answer;
-
-        var sortKey = $"{DateTime.UtcNow.Ticks}-{answerId}";
-        var questionCondensed = question.Length < 9 ? question : question[..9] + "..";
-        var chatId = model.chatId;
-
-        var listHtml = $"""
-                            <div
-                                class="click-color unselectable"
-                               onclick="LoadChat('{sortKey}', '{chatId}')"
-                               style="width:95%; cursor: pointer; background-color: transparent;  border-radius: 10px; padding: 4px 8px;">
-                               {questionCondensed}
-                            </div>
-                        """;
 
         var data = new
         {
