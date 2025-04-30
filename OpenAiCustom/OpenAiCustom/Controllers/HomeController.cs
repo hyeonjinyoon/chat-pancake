@@ -231,6 +231,7 @@ public class HomeController : Controller
             html = answerHtml,
             content = answer,
             answerId = $"answer-{answerId}",
+            questionCondensed = questionCondensed,
             listHtml = listHtml
         };
 
