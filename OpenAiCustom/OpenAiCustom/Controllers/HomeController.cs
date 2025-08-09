@@ -56,12 +56,28 @@ public class HomeController : Controller
     {
         var partitionHash = ComputeSha256Hash(model.data);
 
-        var conditions = new List<ScanCondition>
+        var keyExpr = new Expression
         {
-            new("partition", ScanOperator.Equal, partitionHash),
+            ExpressionStatement = "#pk = :pk",
+            ExpressionAttributeNames = new Dictionary<string, string>
+            {
+                ["#pk"] = "partition"
+            },
+            ExpressionAttributeValues = new Dictionary<string, DynamoDBEntry>
+            {
+                [":pk"] = new Primitive(partitionHash)
+            }
         };
 
-        var list = await AwsManager.DbContext.ScanAsync<PancakeChat>(conditions).GetRemainingAsync();
+        var queryConfig = new QueryOperationConfig
+        {
+            KeyExpression = keyExpr,
+            Limit = 30,             // 최대 30개만
+            BackwardSearch = true   // sort key 기준 내림차순(최신 먼저)
+        };
+
+        var search = AwsManager.DbContext.FromQueryAsync<PancakeChat>(queryConfig);
+        var list = await search.GetNextSetAsync();
 
         var template = $"""
                             <div
@@ -75,7 +91,7 @@ public class HomeController : Controller
         var data = new
         {
             html = template,
-            content = list.Select<PancakeChat, object>(chat => new
+            content = list.Select(chat => new
             {
                 id = chat.id,
                 name = chat.questionCondensed,
