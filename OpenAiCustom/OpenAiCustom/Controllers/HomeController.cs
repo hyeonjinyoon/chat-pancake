@@ -73,7 +73,7 @@ public class HomeController : Controller
         {
             KeyExpression = keyExpr,
             Limit = 30,             // 최대 30개만
-            BackwardSearch = true   // sort key 기준 내림차순(최신 먼저)
+            BackwardSearch = false   // sort key 기준 내림차순(최신 먼저)
         };
 
         var search = AwsManager.DbContext.FromQueryAsync<PancakeChat>(queryConfig);
