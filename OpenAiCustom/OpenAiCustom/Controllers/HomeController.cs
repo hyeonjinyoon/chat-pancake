@@ -39,7 +39,7 @@ public class HomeController : Controller
     }
     
     [HttpPost]
-    public async Task<JsonResult> GetDefaultModel([FromBody] ModelDefault model)
+    public async Task<JsonResult> GetDefaultModel()
     {
         var defaultModel = Environment.GetEnvironmentVariable("DEFAULT_CHAT_MODEL") ?? string.Empty;
 
@@ -54,31 +54,32 @@ public class HomeController : Controller
     [HttpPost]
     public async Task<JsonResult> GetChatList([FromBody] ModelDefault model)
     {
-        var partitionHash = ComputeSha256Hash(model.data);
-
-        var keyExpr = new Expression
-        {
-            ExpressionStatement = "#pk = :pk",
-            ExpressionAttributeNames = new Dictionary<string, string>
-            {
-                ["#pk"] = "partition"
-            },
-            ExpressionAttributeValues = new Dictionary<string, DynamoDBEntry>
-            {
-                [":pk"] = new Primitive(partitionHash)
-            }
-        };
-
-        var queryConfig = new QueryOperationConfig
-        {
-            KeyExpression = keyExpr,
-            Limit = 30,             // 최대 30개만
-            BackwardSearch = true   // sort key 기준 내림차순(최신 먼저)
-        };
-
-        var search = AwsManager.DbContext.FromQueryAsync<PancakeChat>(queryConfig);
-        var list = await search.GetNextSetAsync();
-
+        // var partitionHash = ComputeSha256Hash(model.data);
+        //
+        // var keyExpr = new Expression
+        // {
+        //     ExpressionStatement = "#pk = :pk",
+        //     ExpressionAttributeNames = new Dictionary<string, string>
+        //     {
+        //         ["#pk"] = "partition"
+        //     },
+        //     ExpressionAttributeValues = new Dictionary<string, DynamoDBEntry>
+        //     {
+        //         [":pk"] = new Primitive(partitionHash)
+        //     }
+        // };
+        //
+        // var queryConfig = new QueryOperationConfig
+        // {
+        //     KeyExpression = keyExpr,
+        //     Limit = 30,             // 최대 30개만
+        //     BackwardSearch = true   // sort key 기준 내림차순(최신 먼저)
+        // };
+        //
+        // var search = AwsManager.DbContext.FromQueryAsync<PancakeChat>(queryConfig);
+        // var list = await search.GetNextSetAsync();
+        var list = new List<PancakeChat>();
+        
         var template = $"""
                             <div
                                 class="click-color unselectable"
@@ -191,10 +192,10 @@ public class HomeController : Controller
 
         Console.WriteLine($"Received question: {question}");
 
-        var noSave = question.Contains("!nosave");
-
-        if (noSave)
-            question = question.Replace("!nosave", "");
+        // var noSave = question.Contains("!nosave");
+        //
+        // if (noSave)
+        //     question = question.Replace("!nosave", "");
 
         var sortKey = $"{DateTime.UtcNow.Ticks}-{answerId}";
         var questionCondensed = question.Length < 9 ? question : question[..9] + "..";
@@ -239,8 +240,8 @@ public class HomeController : Controller
 
         answerHtml = answerHtml.Replace("%%%Second", $"{creationElapsedTime:N0}");
 
-        if (noSave)
-            answer = "(This conversation is not saved.)\n" + answer;
+        // if (noSave)
+        //     answer = "(This conversation is not saved.)\n" + answer;
 
         var data = new
         {
@@ -251,27 +252,27 @@ public class HomeController : Controller
             listHtml = listHtml
         };
 
-        if (noSave)
-            return Json(data);
-
-        var partitionHash = ComputeSha256Hash(apiKey);
-
-        var chatData = new PancakeChat
-        {
-            dateTime = DateTime.UtcNow,
-            partition = partitionHash,
-            id = sortKey,
-            creationElapsedTime = creationElapsedTime,
-            question = question,
-            questionCondensed = questionCondensed,
-            instructions = instructions,
-            content = answer,
-            answerId = answerId,
-            modelId = model.modelId,
-            chatId = chatId
-        };
-
-        await AwsManager.DbContext.SaveAsync(chatData);
+        // if (noSave)
+        //     return Json(data);
+        //
+        // var partitionHash = ComputeSha256Hash(apiKey);
+        //
+        // var chatData = new PancakeChat
+        // {
+        //     dateTime = DateTime.UtcNow,
+        //     partition = partitionHash,
+        //     id = sortKey,
+        //     creationElapsedTime = creationElapsedTime,
+        //     question = question,
+        //     questionCondensed = questionCondensed,
+        //     instructions = instructions,
+        //     content = answer,
+        //     answerId = answerId,
+        //     modelId = model.modelId,
+        //     chatId = chatId
+        // };
+        //
+        // await AwsManager.DbContext.SaveAsync(chatData);
 
         return Json(data);
     }

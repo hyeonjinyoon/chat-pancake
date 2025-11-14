@@ -99,6 +99,20 @@
                 apiKeyText = savedApiKey;
                 OnApiKeySettingDone();
             }
+
+            const savedModel = getCookie("modelName");
+            if (savedModel) {
+                modelName = savedModel;
+            } else {
+                GetDefaultModel();
+            }
+
+            const savedInstructionText = getCookie("instructionText");
+            if (savedInstructionText) {
+                instructionText = savedInstructionText;
+            }
+
+            OnUpdateSettings();
         });
 
         function handleKeyDown(e) {
@@ -108,16 +122,13 @@
             }
         }
 
-        function GetDefaultModel(id) {
+        function GetDefaultModel() {
             fetch('@Url.Action("GetDefaultModel")', {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json; charset=utf-8'
-                },
-                body: JSON.stringify({
-                    data: id
-                })
+                }
             })
                 .then(response => {
                     if (!response.ok) {
@@ -127,7 +138,7 @@
                 })
                 .then(data => {
                     modelName = data.model;
-                    $('#model').text(modelName);
+                    OnUpdateSettings();
                 })
                 .catch(error => {
                     $('#chat-list').html("error");
@@ -249,18 +260,26 @@
             let val = document.getElementById('modalText').value;
             if (currentEdit === "instructions") {
                 instructionText = val;
+                setCookie("instructionText", instructionText, 365);
             } else if (currentEdit === "apikey") {
                 apiKeyText = val;
                 setCookie("apiKey", apiKeyText, 365);
             } else if (currentEdit === "model") {
                 modelName = val;
+                setCookie("modelName", modelName, 365);
             }
             closeModal();
         }
 
         function closeModal() {
+            OnUpdateSettings();
+            if (currentEdit === "apikey" && apiKeyText !== "") {
+                OnApiKeySettingDone();
+            }
             document.getElementById('modalInput').style.display = 'none';
+        }
 
+        function OnUpdateSettings() {
             $('#model').text(modelName);
 
             if (instructionText === "") {
@@ -268,16 +287,12 @@
             } else {
                 $('#instructions').text('지침: ' + instructionText.substring(0, 6) + '...');
             }
-
-            if (currentEdit === "apikey" && apiKeyText !== "") {
-                OnApiKeySettingDone();
-            }
         }
 
         function OnApiKeySettingDone() {
-            $('#api-key').text("-");
+            $('#api-key').text("25.11.14");
             GetChatList(apiKeyText);
-            GetDefaultModel(apiKeyText);
+            OnUpdateSettings();
         }
 
         function SendInput() {
