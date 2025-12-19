@@ -136,6 +136,104 @@ body {
     border-bottom: none;
 }
 
+.instruction-selector {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+}
+
+.instruction-history-dropdown {
+    position: absolute;
+    right: 0;
+    bottom: 36px;
+    width: min(520px, calc(100vw - 24px));
+    max-height: 320px;
+    overflow: hidden;
+
+    background: #1f1f1f;
+    border: 1px solid #3a3a3a;
+    border-radius: 12px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
+    z-index: 10000;
+}
+
+.instruction-history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 10px;
+    border-bottom: 1px solid #2f2f2f;
+    color: #ccc;
+    font-size: 13px;
+}
+
+.instruction-history-clear {
+    color: #919191;
+    background: transparent;
+    border: 0;
+    padding: 4px 6px;
+    font-size: 12px;
+}
+
+.instruction-history-clear:hover {
+    color: #e0e0e0;
+}
+
+.instruction-history-items {
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.instruction-history-empty {
+    padding: 12px;
+    color: #707070;
+    font-size: 13px;
+}
+
+.instruction-history-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border-bottom: 1px solid #2a2a2a;
+}
+
+.instruction-history-row:last-child {
+    border-bottom: 0;
+}
+
+.instruction-history-apply {
+    flex: 1;
+    text-align: left;
+    color: #ccc;
+    background: transparent;
+    border: 0;
+    padding: 6px 8px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.instruction-history-apply:hover {
+    background: #2a2a2a;
+}
+
+.instruction-history-delete {
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+
+    color: #919191;
+    background: transparent;
+    border: 0;
+    border-radius: 8px;
+}
+
+.instruction-history-delete:hover {
+    background: #2a2a2a;
+    color: #e0e0e0;
+}
+
 @keyframes tilt {
     0% {
         transform: rotate(0deg);

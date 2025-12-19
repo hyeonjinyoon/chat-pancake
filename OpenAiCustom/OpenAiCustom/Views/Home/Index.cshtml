@@ -26,10 +26,25 @@
                             style="margin-top: 2px;">
                         model
                     </button>
-                    <button id="instructions" class="chat-button" type="button" onclick="openInput('instructions')"
-                            style="margin-top: 2px;">
-                        지침 없음
-                    </button>
+                    <div class="instruction-selector">
+                        <button id="instructions" class="chat-button" type="button" onclick="openInput('instructions')"
+                                style="margin-top: 2px;">
+                            지침 없음
+                        </button>
+                        <button id="instruction-history-toggle" class="chat-button" type="button"
+                                aria-label="지침 히스토리" onclick="toggleInstructionHistory(event)"
+                                style="margin-top: 2px; padding: 4px 8px;">
+                            <i class="bi bi-list"></i>
+                        </button>
+
+                        <div id="instruction-history-dropdown" class="instruction-history-dropdown" style="display:none;">
+                            <div class="instruction-history-header">
+                                <span>이전 지침</span>
+                                <button type="button" class="instruction-history-clear" onclick="clearInstructionHistory()">비우기</button>
+                            </div>
+                            <div id="instruction-history-items" class="instruction-history-items"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -93,6 +108,9 @@
         let modelName = "-";
         let currentEdit = "";
 
+        const instructionHistoryStorageKey = "instructionHistory";
+        const instructionHistoryLimit = 20;
+
         document.addEventListener("DOMContentLoaded", function () {
             const savedApiKey = getCookie("apiKey");
             if (savedApiKey) {
@@ -110,6 +128,18 @@
             const savedInstructionText = getCookie("instructionText");
             if (savedInstructionText) {
                 instructionText = savedInstructionText;
+            }
+
+            addInstructionToHistory(instructionText);
+            renderInstructionHistory();
+
+            document.addEventListener("click", closeInstructionHistory);
+
+            const dropdown = document.getElementById("instruction-history-dropdown");
+            if (dropdown) {
+                dropdown.addEventListener("click", function (e) {
+                    e.stopPropagation();
+                });
             }
 
             OnUpdateSettings();
@@ -261,6 +291,8 @@
             if (currentEdit === "instructions") {
                 instructionText = val;
                 setCookie("instructionText", instructionText, 365);
+                addInstructionToHistory(instructionText);
+                renderInstructionHistory();
             } else if (currentEdit === "apikey") {
                 apiKeyText = val;
                 setCookie("apiKey", apiKeyText, 365);
@@ -369,6 +401,145 @@
         function copyToClipboard(id) {
             const textToCopy = document.getElementById(id).textContent;
             navigator.clipboard.writeText(textToCopy);
+        }
+
+        function normalizeInstructionText(text) {
+            return (text ?? "").trim();
+        }
+
+        function loadInstructionHistory() {
+            try {
+                const raw = localStorage.getItem(instructionHistoryStorageKey);
+                if (!raw) return [];
+
+                const parsed = JSON.parse(raw);
+                if (!Array.isArray(parsed)) return [];
+
+                // 하위 호환: string[] -> object[] 로 변환
+                return parsed
+                    .map(x => {
+                        if (typeof x === "string") {
+                            return { text: normalizeInstructionText(x), updatedAt: new Date().toISOString() };
+                        }
+                        if (x && typeof x === "object") {
+                            return {
+                                text: normalizeInstructionText(x.text ?? ""),
+                                updatedAt: x.updatedAt ?? new Date().toISOString(),
+                            };
+                        }
+                        return null;
+                    })
+                    .filter(x => x && x.text);
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveInstructionHistory(list) {
+            try {
+                localStorage.setItem(instructionHistoryStorageKey, JSON.stringify(list));
+            } catch (e) {
+            }
+        }
+
+        function addInstructionToHistory(text) {
+            const normalized = normalizeInstructionText(text);
+            if (!normalized) return;
+
+            const list = loadInstructionHistory();
+
+            const filtered = list.filter(x => normalizeInstructionText(x.text) !== normalized);
+            filtered.unshift({ text: normalized, updatedAt: new Date().toISOString() });
+
+            saveInstructionHistory(filtered.slice(0, instructionHistoryLimit));
+        }
+
+        function renderInstructionHistory() {
+            const itemsRoot = document.getElementById("instruction-history-items");
+            if (!itemsRoot) return;
+
+            const list = loadInstructionHistory();
+            itemsRoot.innerHTML = "";
+
+            if (list.length === 0) {
+                const empty = document.createElement("div");
+                empty.className = "instruction-history-empty";
+                empty.textContent = "기록 없음";
+                itemsRoot.appendChild(empty);
+                return;
+            }
+
+            list.forEach((item, index) => {
+                const row = document.createElement("div");
+                row.className = "instruction-history-row";
+
+                const applyBtn = document.createElement("button");
+                applyBtn.type = "button";
+                applyBtn.className = "instruction-history-apply";
+
+                // 표시용 텍스트는 1줄로 축약
+                const displayText = item.text.replace(/\s+/g, " ").trim();
+                applyBtn.textContent = displayText.length > 60 ? (displayText.substring(0, 60) + "…") : displayText;
+                applyBtn.title = item.text;
+
+                applyBtn.addEventListener("click", function () {
+                    applyInstruction(item.text);
+                });
+
+                const deleteBtn = document.createElement("button");
+                deleteBtn.type = "button";
+                deleteBtn.className = "instruction-history-delete";
+                deleteBtn.textContent = "×";
+                deleteBtn.title = "삭제";
+                deleteBtn.addEventListener("click", function () {
+                    deleteInstructionHistoryAt(index);
+                });
+
+                row.appendChild(applyBtn);
+                row.appendChild(deleteBtn);
+                itemsRoot.appendChild(row);
+            });
+        }
+
+        function applyInstruction(text) {
+            instructionText = text;
+            setCookie("instructionText", instructionText, 365);
+            addInstructionToHistory(instructionText);
+            OnUpdateSettings();
+            renderInstructionHistory();
+            closeInstructionHistory();
+        }
+
+        function deleteInstructionHistoryAt(index) {
+            const list = loadInstructionHistory();
+            if (index < 0 || index >= list.length) return;
+            list.splice(index, 1);
+            saveInstructionHistory(list);
+            renderInstructionHistory();
+        }
+
+        function clearInstructionHistory() {
+            saveInstructionHistory([]);
+            renderInstructionHistory();
+        }
+
+        function toggleInstructionHistory(e) {
+            if (e) e.stopPropagation();
+            const dropdown = document.getElementById("instruction-history-dropdown");
+            if (!dropdown) return;
+
+            if (dropdown.style.display === "none" || dropdown.style.display === "") {
+                renderInstructionHistory();
+                dropdown.style.display = "block";
+            } else {
+                dropdown.style.display = "none";
+            }
+        }
+
+        function closeInstructionHistory() {
+            const dropdown = document.getElementById("instruction-history-dropdown");
+            if (!dropdown) return;
+            dropdown.style.display = "none";
         }
 
         function setCookie(name, value, days) {
