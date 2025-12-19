@@ -1,9 +1,6 @@
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
-using Amazon.DynamoDBv2.DataModel;
-using Amazon.DynamoDBv2.DocumentModel;
-using Markdig;
 using Microsoft.AspNetCore.Mvc;
 using OpenAiCustom.Managers;
 using OpenAiCustom.Models;
@@ -52,46 +49,22 @@ public class HomeController : Controller
     }
 
     [HttpPost]
-    public async Task<JsonResult> GetChatList([FromBody] ModelDefault model)
+    public Task<JsonResult> GetChatList([FromBody] ModelDefault model)
     {
-        // var partitionHash = ComputeSha256Hash(model.data);
-        //
-        // var keyExpr = new Expression
-        // {
-        //     ExpressionStatement = "#pk = :pk",
-        //     ExpressionAttributeNames = new Dictionary<string, string>
-        //     {
-        //         ["#pk"] = "partition"
-        //     },
-        //     ExpressionAttributeValues = new Dictionary<string, DynamoDBEntry>
-        //     {
-        //         [":pk"] = new Primitive(partitionHash)
-        //     }
-        // };
-        //
-        // var queryConfig = new QueryOperationConfig
-        // {
-        //     KeyExpression = keyExpr,
-        //     Limit = 30,             // 최대 30개만
-        //     BackwardSearch = true   // sort key 기준 내림차순(최신 먼저)
-        // };
-        //
-        // var search = AwsManager.DbContext.FromQueryAsync<PancakeChat>(queryConfig);
-        // var list = await search.GetNextSetAsync();
         var list = new List<PancakeChat>();
         
-        var template = $"""
-                            <div
-                                class="click-color unselectable"
-                               onclick="LoadChat('sortId', 'chatId')"
-                               style="width:95%; cursor: pointer; background-color: transparent;  border-radius: 10px; padding: 4px 8px;">
-                               chatName
-                            </div>
-                        """;
+        const string TEMPLATE = $"""
+                                     <div
+                                         class="click-color unselectable"
+                                        onclick="LoadChat('sortId', 'chatId')"
+                                        style="width:95%; cursor: pointer; background-color: transparent;  border-radius: 10px; padding: 4px 8px;">
+                                        chatName
+                                     </div>
+                                 """;
 
         var data = new
         {
-            html = template,
+            html = TEMPLATE,
             content = list.Select(chat => new
             {
                 id = chat.id,
@@ -100,7 +73,7 @@ public class HomeController : Controller
             }).ToList(),
         };
 
-        return Json(data);
+        return Task.FromResult(Json(data));
     }
 
     [HttpPost]
@@ -190,12 +163,8 @@ public class HomeController : Controller
         var instructions = model.instructions;
         var apiKey = model.apiKey;
 
-        Console.WriteLine($"Received question: {question}");
-
-        // var noSave = question.Contains("!nosave");
-        //
-        // if (noSave)
-        //     question = question.Replace("!nosave", "");
+        var requesterIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        _logger.LogInformation("ReceiveText requested from IP: {RequesterIp}", requesterIp);
 
         var sortKey = $"{DateTime.UtcNow.Ticks}-{answerId}";
         var questionCondensed = question.Length < 9 ? question : question[..9] + "..";

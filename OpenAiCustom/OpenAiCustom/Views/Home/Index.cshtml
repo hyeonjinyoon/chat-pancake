@@ -103,6 +103,7 @@
 @section Scripts
 {
     <script type="text/javascript">
+        let currentVersion = "25.12.19";
         let instructionText = "";
         let apiKeyText = "";
         let modelName = "-";
@@ -322,7 +323,7 @@
         }
 
         function OnApiKeySettingDone() {
-            $('#api-key').text("25.11.14");
+            $('#api-key').text(currentVersion);
             GetChatList(apiKeyText);
             OnUpdateSettings();
         }
