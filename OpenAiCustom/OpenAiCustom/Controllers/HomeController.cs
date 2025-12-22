@@ -34,7 +34,7 @@ public class HomeController : Controller
             RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
         });
     }
-    
+
     [HttpPost]
     public async Task<JsonResult> GetDefaultModel()
     {
@@ -52,7 +52,7 @@ public class HomeController : Controller
     public Task<JsonResult> GetChatList([FromBody] ModelDefault model)
     {
         var list = new List<PancakeChat>();
-        
+
         const string TEMPLATE = $"""
                                      <div
                                          class="click-color unselectable"
@@ -104,7 +104,7 @@ public class HomeController : Controller
                               white-space: pre-wrap;
                               overflow: auto;
                               align-items: center;"></div>
-                          
+
                               <div style='width: 20px; height: 20px; margin-right: auto; color: #919191; cursor: pointer;' onclick=copyToClipboard('{chatAnswerId}')>
                               <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-copy' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z'/></svg>
                               </div>
@@ -142,7 +142,7 @@ public class HomeController : Controller
                               white-space: pre-wrap;
                               overflow: auto;
                               align-items: center;"></div>
-                          
+
                               <div style='width: 20px; height: 20px; margin-right: auto; color: #919191; cursor: pointer;' onclick=copyToClipboard('answer-{answerId}')>
                               <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-copy' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z'/></svg>
                               </div>
@@ -169,7 +169,7 @@ public class HomeController : Controller
         var sortKey = $"{DateTime.UtcNow.Ticks}-{answerId}";
         var questionCondensed = question.Length < 9 ? question : question[..9] + "..";
         var chatId = model.chatId;
-        
+
         var listHtml = $"""
                             <div
                                 class="click-color unselectable"
@@ -178,9 +178,9 @@ public class HomeController : Controller
                                {questionCondensed}
                             </div>
                         """;
-        
+
         var timeBegin = DateTime.Now;
-        
+
         if (string.IsNullOrEmpty(apiKey))
         {
             answerHtml = answerHtml.Replace("%%%Second", "0");
@@ -196,11 +196,9 @@ public class HomeController : Controller
 
         var questionText = "";
 
-        if (string.IsNullOrEmpty(instructions))
-            questionText = question;
-        else
-            questionText = $"Please read the question and instructions below and answer accordingly.\nQuestion:{{{question}}},Instructions:{{{instructions}}}";
-        
+        questionText = string.IsNullOrEmpty(instructions) ? question
+            : $"Please read the question and instructions below and answer accordingly.\nQuestion:\n```\n{question}\n```\nInstructions:\n```\n{instructions}\n```";
+
         var answer = await OpenAiManager.GetChat(apiKey, model.modelId, questionText);
 
         var timeComplete = DateTime.Now;
@@ -208,9 +206,6 @@ public class HomeController : Controller
         var creationElapsedTime = (timeComplete - timeBegin).TotalSeconds;
 
         answerHtml = answerHtml.Replace("%%%Second", $"{creationElapsedTime:N0}");
-
-        // if (noSave)
-        //     answer = "(This conversation is not saved.)\n" + answer;
 
         var data = new
         {
@@ -220,29 +215,6 @@ public class HomeController : Controller
             questionCondensed = questionCondensed,
             listHtml = listHtml
         };
-
-        // if (noSave)
-        //     return Json(data);
-        //
-        // var partitionHash = ComputeSha256Hash(apiKey);
-        //
-        // var chatData = new PancakeChat
-        // {
-        //     dateTime = DateTime.UtcNow,
-        //     partition = partitionHash,
-        //     id = sortKey,
-        //     creationElapsedTime = creationElapsedTime,
-        //     question = question,
-        //     questionCondensed = questionCondensed,
-        //     instructions = instructions,
-        //     content = answer,
-        //     answerId = answerId,
-        //     modelId = model.modelId,
-        //     chatId = chatId
-        // };
-        //
-        // await AwsManager.DbContext.SaveAsync(chatData);
-
         return Json(data);
     }
 
